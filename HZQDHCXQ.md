@@ -101,12 +101,12 @@ The implementation phase executed the project’s core tasks:
 Extracted hour_of_day, day_of_week from accept_time in both datasets.
 Aggregated features: avg_delivery_time_per_city (LaDe-D), avg_pickup_time_per_city (LaDe-P).
 Standardized numerical features with StandardScaler; applied log transformation to y_delivery and y_pickup.
-Model Training:
+**Model Training:**
 Trained Random Forest on LaDe-D (n_estimators=100, max_depth=10).
 Trained Lasso Regression on LaDe-P (alpha=0.1).
 Tested XGBoost (learning_rate=0.05, max_depth=6), achieving MAE of 4.2 minutes (LaDe-D) and 3.8 minutes (LaDe-P).
 Explored LSTM/GRU models, yielding MAE of 5.1 minutes but with higher computational cost.
-API Development:
+**API Development:**
 Built FastAPI service with endpoints:
 python
 
@@ -148,35 +148,35 @@ from math import radians, sin, cos, sqrt, atan2
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-3.4 Testing
+### 3.4 Testing
 The testing phase ensured system reliability and performance:
 
-Unit Testing:
+**Unit Testing:**
 Tested API endpoints with sample inputs from LaDe-D (e.g., {"accept_time": "2025-03-01 10:00:00", "delivery_lat": 40.7128, "delivery_lng": -74.0060}) and LaDe-P.
 Verified preprocessing functions (e.g., Haversine distance calculation).
-Integration Testing:
+**Integration Testing:**
 Validated the end-to-end pipeline: data ingestion → preprocessing → model prediction → API response.
 Ensured consistency between training data (LaDe-D, LaDe-P) and API input formats.
-Performance Testing:
+**Performance Testing:**
 Conducted load testing with 1,000 concurrent requests using tools like locust; achieved an average response time of 150ms.
 Tested scalability by simulating peak traffic scenarios (e.g., 2,000 requests/minute).
-Model Validation:
+**Model Validation:**
 Evaluated models on 20% holdout sets from LaDe-D and LaDe-P:
-Random Forest: MAE 5.5 minutes (LaDe-D), 5.8 minutes (LaDe-P).
-Lasso: MAE 6.0 minutes (LaDe-D), 6.2 minutes (LaDe-P).
-XGBoost: MAE 4.2 minutes (LaDe-D), 3.8 minutes (LaDe-P).
-LSTM: MAE 5.1 minutes (both datasets).
+**Random Forest:** MAE 5.5 minutes (LaDe-D), 5.8 minutes (LaDe-P).
+**Lasso:** MAE 6.0 minutes (LaDe-D), 6.2 minutes (LaDe-P).
+**XGBoost:** MAE 4.2 minutes (LaDe-D), 3.8 minutes (LaDe-P).
+**LSTM:** MAE 5.1 minutes (both datasets).
 Used 5-fold cross-validation to confirm robustness.
-Robustness Testing:
+**Robustness Testing:**
 Applied SHAP (SHapley Additive exPlanations) analysis, identifying distance and hour_of_day as top contributors in both LaDe-D and LaDe-P models.
 Permutation Importance showed city had low impact, leading to its exclusion in final models.
-3.5 Deployment
+### 3.5 Deployment
 The deployment phase operationalized the solution:
 
-Model Preparation:
+**Model Preparation:**
 Finalized XGBoost models for LaDe-D (delivery_model.pkl) and LaDe-P (pickup_model.pkl) using joblib.
 Saved preprocessing objects (e.g., StandardScaler) to ensure consistency between training and inference.
-Containerization:
+**Containerization:**
 Created a Dockerfile for the FastAPI service:
 dockerfile
 
@@ -192,86 +192,86 @@ RUN pip install -r requirements.txt
 COPY . .
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 Generated requirements.txt with dependencies: fastapi, xgboost, joblib, pandas, numpy, etc.
-Tested locally: docker build -t eta-predictor . and docker run -p 8000:8000 eta-predictor.
-Cloud Deployment:
+**Tested locally:** docker build -t eta-predictor . and docker run -p 8000:8000 eta-predictor.
+**Cloud Deployment:**
 Deployed on AWS EC2 with 2 vCPUs and 4GB RAM per instance.
 Configured API Gateway for routing and a load balancer for traffic distribution.
 Enabled auto-scaling to handle up to 5,000 requests/minute.
 Integrated Prometheus for real-time monitoring of latency and error rates.
-Documentation:
+**Documentation:**
 Provided Swagger/OpenAPI specs for API endpoints:
-/predict_delivery_time: Accepts accept_time, delivery_lat, delivery_lng; returns ETA in minutes.
-/predict_pickup_time: Accepts accept_time, pickup_lat, pickup_lng; returns ETA in minutes.
+**/predict_delivery_time:** Accepts accept_time, delivery_lat, delivery_lng; returns ETA in minutes.
+**/predict_pickup_time:** Accepts accept_time, pickup_lat, pickup_lng; returns ETA in minutes.
 Shared credentials and usage instructions with the team via a secure channel.
-3.6 Maintenance
+### 3.6 Maintenance
 The maintenance phase ensured long-term performance:
 
-Monitoring:
+**Monitoring:**
 Set up Prometheus dashboards to track API metrics (e.g., latency, request rate) and model accuracy (MAE averaged 4.5 minutes in production).
 Used ELK stack for logging and error analysis.
-Updates:
+**Updates:**
 Established a CI/CD pipeline for monthly retraining with new LaDe-D and LaDe-P data, deployed via GitHub Actions.
 Initial retraining completed on March 1, 2025, incorporating February 2025 delivery logs.
-Alerts:
+**Alerts:**
 Configured Slack notifications for API latency exceeding 300ms or prediction errors above 10%.
 Set up alerts for model drift (e.g., MAE increasing beyond 5 minutes), triggering manual review.
-4. Software Development Models
-4.1 Waterfall Model
-Description: A linear, sequential approach where each phase (e.g., requirement analysis, design) is completed before the next begins.
-Application: Employed during initial requirement analysis and system design due to well-defined objectives and data availability (LaDe-D, LaDe-P).
-Challenges: Limited flexibility for mid-project changes, such as adding LSTM models or adjusting features based on EDA insights.
-Outcome: Provided a structured start but was less suited for iterative model development.
-4.2 Agile Model
-Description: An iterative, incremental approach with continuous feedback and adaptability.
-Application: Adopted during implementation, testing, and deployment to support rapid prototyping and refinement.
-Benefits:
+## 4. Software Development Models
+### 4.1 Waterfall Model
+**Description:** A linear, sequential approach where each phase (e.g., requirement analysis, design) is completed before the next begins.
+**Application:** Employed during initial requirement analysis and system design due to well-defined objectives and data availability (LaDe-D, LaDe-P).
+**Challenges:** Limited flexibility for mid-project changes, such as adding LSTM models or adjusting features based on EDA insights.
+**Outcome:** Provided a structured start but was less suited for iterative model development.
+### 4.2 Agile Model
+**Description:** An iterative, incremental approach with continuous feedback and adaptability.
+**Application:** Adopted during implementation, testing, and deployment to support rapid prototyping and refinement.
+**Benefits:**
 Facilitated weekly team meetings to finalize EDA and feature engineering tasks.
 Enabled quick transitions (e.g., from Random Forest to XGBoost) based on performance metrics.
 Reduced development time by approximately 20% compared to a strict Waterfall approach.
-Outcome: Enhanced flexibility and responsiveness, ensuring the project met evolving needs.
-5. Model Building and Deployment Process
+**Outcome:** Enhanced flexibility and responsiveness, ensuring the project met evolving needs.
+## 5. Model Building and Deployment Process
 The model building and deployment process integrated data processing, model development, and operationalization:
 
-Data Collection and Preprocessing:
+**Data Collection and Preprocessing:**
 Processed LaDe-D and LaDe-P, addressing 5% duplicates (via package_id) and 2% missing data (e.g., imputed accept_time).
 Saved cleaned datasets for reproducibility.
-Feature Selection and Engineering:
+**Feature Selection and Engineering:**
 Engineered 10 new features, including distance (Haversine), hour_of_day, and avg_delivery_time_per_city.
 Reduced multicollinearity by excluding low-impact features (e.g., city) based on Permutation Importance.
-Model Training and Validation:
-Evaluated multiple models:
-Random Forest: MAE 5.5 minutes (LaDe-D), 5.8 minutes (LaDe-P).
-Lasso: MAE 6.0 minutes (LaDe-D), 6.2 minutes (LaDe-P).
-XGBoost: MAE 4.2 minutes (LaDe-D), 3.8 minutes (LaDe-P).
-LSTM/GRU: MAE 5.1 minutes (both datasets).
+**Model Training and Validation:**
+**Evaluated multiple models:**
+**Random Forest:** MAE 5.5 minutes (LaDe-D), 5.8 minutes (LaDe-P).
+**Lasso:** MAE 6.0 minutes (LaDe-D), 6.2 minutes (LaDe-P).
+**XGBoost:** MAE 4.2 minutes (LaDe-D), 3.8 minutes (LaDe-P).
+**LSTM/GRU:** MAE 5.1 minutes (both datasets).
 Selected XGBoost for deployment due to its superior accuracy and efficiency.
 Validated with 5-fold cross-validation and SHAP analysis to ensure feature relevance.
-Model Deployment:
+**Model Deployment:**
 Integrated XGBoost models into a FastAPI service with endpoints /predict_delivery_time and /predict_pickup_time.
 Containerized with Docker and deployed on AWS EC2, achieving 99.9% uptime in the first month of production (February 21, 2025 – March 13, 2025).
 Monitored via Prometheus, maintaining an average latency of 150ms under load.
-6. Challenges and Solutions
+## 6. Challenges and Solutions
 The project faced several challenges, addressed through targeted solutions:
 
-Challenge: Missing Data in Timestamps and Coordinates
-Impact: 2% of rows in LaDe-D and LaDe-P had missing accept_time or lng/lat, affecting distance calculations and ETA predictions.
-Solution: Imputed timestamps with median values per city; dropped rows with missing coordinates after confirming minimal impact (<2% data loss).
-Challenge: Outliers in Delivery Times
-Impact: Some y_delivery (LaDe-D) and y_pickup (LaDe-P) values exceeded 60 minutes, skewing model predictions.
-Solution: Capped outliers at 1.5 * IQR (45 minutes), reducing MAE by 0.5 minutes across models.
-Challenge: Model Overfitting
-Impact: Random Forest overfit with training MAE of 3.0 minutes but test MAE of 5.5 minutes (LaDe-D).
-Solution: Applied hyperparameter tuning (max_depth=10) and regularization (Lasso alpha=0.1); XGBoost’s built-in regularization mitigated overfitting effectively.
-Challenge: API Scalability
-Impact: Initial tests showed latency spikes to 500ms under 500 concurrent requests.
-Solution: Deployed on AWS with auto-scaling; optimized Docker container to handle 1,000 requests with 150ms latency.
-Challenge: Team Coordination
-Impact: Delays in EDA and feature engineering due to team member availability (e.g., V. Sai Shruthik’s limited involvement).
-Solution: Assigned manageable tasks (e.g., feature selection to Shruthik, peer reviews to Riddhi); held weekly sync-ups to maintain momentum.
-7. Conclusion
+**Challenge:** Missing Data in Timestamps and Coordinates
+**Impact:** 2% of rows in LaDe-D and LaDe-P had missing accept_time or lng/lat, affecting distance calculations and ETA predictions.
+**Solution:** Imputed timestamps with median values per city; dropped rows with missing coordinates after confirming minimal impact (<2% data loss).
+**Challenge:** Outliers in Delivery Times
+**Impact:** Some y_delivery (LaDe-D) and y_pickup (LaDe-P) values exceeded 60 minutes, skewing model predictions.
+**Solution:** Capped outliers at 1.5 * IQR (45 minutes), reducing MAE by 0.5 minutes across models.
+**Challenge:** Model Overfitting
+**Impact:** Random Forest overfit with training MAE of 3.0 minutes but test MAE of 5.5 minutes (LaDe-D).
+**Solution:** Applied hyperparameter tuning (max_depth=10) and regularization (Lasso alpha=0.1); XGBoost’s built-in regularization mitigated overfitting effectively.
+**Challenge:** API Scalability
+**Impact:** Initial tests showed latency spikes to 500ms under 500 concurrent requests.
+**Solution:** Deployed on AWS with auto-scaling; optimized Docker container to handle 1,000 requests with 150ms latency.
+**Challenge:** Team Coordination
+**Impact:** Delays in EDA and feature engineering due to team member availability (e.g., V. Sai Shruthik’s limited involvement).
+**Solution:** Assigned manageable tasks (e.g., feature selection to Shruthik, peer reviews to Riddhi); held weekly sync-ups to maintain momentum.
+## 7. Conclusion
 The Last Mile Delivery Optimization Project successfully delivered a robust ETA prediction system, achieving an MAE of 4.2 minutes for delivery (LaDe-D) and 3.8 minutes for pickup (LaDe-P). By adopting a hybrid SDLC approach—Waterfall for planning and Agile for execution—we balanced structure with flexibility. The deployment of XGBoost models on AWS via FastAPI provided a scalable, real-time solution, reducing operational delays and enhancing customer satisfaction. With 99.9% uptime and a production MAE of 4.5 minutes, the system demonstrates significant improvements over baseline estimates. Future enhancements could include integrating real-time traffic data or expanding to multi-region models, building on this solid foundation.
 
-8. References
+## 8. References
 Pandas Documentation: https://pandas.pydata.org/
 Scikit-learn Documentation: https://scikit-learn.org/
 XGBoost Documentation: https://xgboost.readthedocs.io/
